@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.IntStream;
@@ -16,13 +17,14 @@ public class SinglePlayerServer extends SocketAgent {
     public static void main(String[] args)throws IOException {
         ServerSocket serverSocket = null;
         int x;
+        int[] secretCode;
         try{
             
             serverSocket = new ServerSocket(PORT_NUMBER);
-            Socket sSocket = serverSocket.accept();
-            String message = "Please enter integer from 3 to 8:";            
-            sendMessage(sSocket, message);
-            x = getXFromClient(sSocket);
+            Socket s = serverSocket.accept();
+            x = getXFromClient(s);
+            secretCode = generateSecretCode(x);
+            sendMessage(s, START_GUESSING_MESSAGE);
         }
 
         finally{
@@ -34,9 +36,9 @@ public class SinglePlayerServer extends SocketAgent {
         int x  = 0;
         while(true){
             try{
-                String message = "Please enter integer from 3 to 8:";
+                System.out.println("Getting X from client...");
+                String message = "Please enter an integer from 3 to 8:";
                 sendMessage(s, message);
-                // System.out.println("Please enter an integer between 3 - 8:");
                 InputStream inStream = s.getInputStream();
                 BufferedReader  reader =  new BufferedReader(new InputStreamReader(inStream));
                 String line = null;
@@ -46,7 +48,8 @@ public class SinglePlayerServer extends SocketAgent {
                     if(isNumeric(line)){
                         if(convertStringToInt(line) >= 3  && convertStringToInt(line)<=8){
                             x = convertStringToInt(line);
-                            System.out.println("Selected x: "+  x);
+                            System.out.println("Selected X: "+  x);
+                            sendMessage(s, X_ACCEPTED_MESSAGE);
                             break;
                         }
                     }

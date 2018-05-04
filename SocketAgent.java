@@ -15,24 +15,28 @@ import java.net.Socket;
 public  abstract class SocketAgent{
     final static String SERVER_ADDRESS = "127.0.0.1";
     final static int PORT_NUMBER = 1324;
-    
-    // Socket cSocket;
-    public static void readMessage(Socket cSocket){
+    final static String X_ACCEPTED_MESSAGE = "Server accepted X";
+    final static String START_GUESSING_MESSAGE = "Secret code generated successfully \n Please enter your guess:";
+
+    public static String readMessage(Socket s){
+        String message  = null;
         try{
-            BufferedReader inMessage = new BufferedReader(new InputStreamReader(cSocket.getInputStream()));
+            BufferedReader inMessage = new BufferedReader(new InputStreamReader(s.getInputStream()));
             String line  = null;
             if((line = inMessage.readLine())!=null){
                 System.out.println("Server: "+ line);
+                message = line;
             }
         } catch (IOException e){
             e.printStackTrace();
         }
+        return message;
     }
     public static void sendMessage(Socket s, String message){
         try{
             PrintWriter out = new PrintWriter(s.getOutputStream(),true);
             out.println(message);
-            System.out.println("Message sent: "+ message);
+            // System.out.println("Message sent: "+ message);
         } catch (IOException e){
             e.printStackTrace();
         }
