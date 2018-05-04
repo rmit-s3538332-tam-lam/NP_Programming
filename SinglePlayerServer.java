@@ -32,6 +32,8 @@ public class SinglePlayerServer extends SocketAgent {
             serverSocket.close();
         }
     }
+
+    //reponse to client guess attempt, announce winning or losing
     private static void play(Socket s,int[] secretCode){
        
         Boolean match = false;
@@ -53,21 +55,20 @@ public class SinglePlayerServer extends SocketAgent {
             String hintMessage = "Correct Position: "+ correctPosition  +  
             "         Incorrect Position: "+ incorrectPosition;
             sendMessage(s, hintMessage);    
-            // if(attemptCount  == 9 ){
-            //     sendWinOrLoseMessage(s, match, attemptCount, secretCode);
-            // }
             attemptCount +=1;
         }
         sendWinOrLoseMessage(s, match, attemptCount, secretCode);
 
-        
     }
+    // a result message to send after game is concluded
     private static void  sendWinOrLoseMessage(Socket s, Boolean match, int attemptCount, int[] secretCode){
         String message =  match? WIN_MESSAGE : LOSE_MESSAGE;
         message += " Secret code: "+ Arrays.toString(secretCode) + "     Attempt count: "+ attemptCount;
         System.out.println(message);
         sendMessage(s, message);
     }
+
+    //valid and getting X from client
     private static int getXFromClient(Socket s){
         int x  = 0;
         while(true){
@@ -96,6 +97,7 @@ public class SinglePlayerServer extends SocketAgent {
         }
         return x;
     }  
+
     private static int getCorrectPosition(int[] secretCode,int[] guessCode){
         int correctPosition  = 0;
         if(isMatch(secretCode, guessCode)){
@@ -111,6 +113,7 @@ public class SinglePlayerServer extends SocketAgent {
         }
         return correctPosition;
     }
+    //Total match position is sum of correct and incorrect positions
     private static int getTotalMatchPosition(int[]secretCode,  int[] guessCode){
         int[] largeTempArray = null;
         int[] smallTempArray = null;
@@ -131,12 +134,15 @@ public class SinglePlayerServer extends SocketAgent {
         }
         return matchPosition;
     }
+    
     private static int getIncorrectPosition(int[] secretCode, int[] guessCode){
         int totalMatchPosition = getTotalMatchPosition(secretCode, guessCode);
         int correctPosition = getCorrectPosition(secretCode, guessCode);
         int incorrectPosition = totalMatchPosition - correctPosition;
         return incorrectPosition;
     }
+
+    //are 2 code completely match( all are correct positions)
     private static boolean isMatch(int[] secretCode, int[] guessCode){
         if(Arrays.equals(secretCode, guessCode)) {
             System.out.println("Matched!!");
@@ -144,6 +150,8 @@ public class SinglePlayerServer extends SocketAgent {
         }
         return false;
     }
+
+    //generate unquie secret code
     private static int[] generateSecretCode(int size){
         ArrayList<Integer> list = new ArrayList<>(11);
         for (int i = 0; i < 10; i++){

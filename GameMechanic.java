@@ -10,7 +10,9 @@ import java.util.stream.IntStream;
 
 import javax.swing.plaf.synth.SynthToolTipUI;
 
-public class SinglePlayerServer {
+//Game mechanic in offline mode (console game)
+//Ignore this class
+public class GameMechanic {
     static final int PORT_NUMBER = 1324;
     public static void main(String[] args) {
         int attemptCount = 1;

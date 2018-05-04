@@ -16,6 +16,16 @@ public class SinglePlayerClient extends SocketAgent{
         guessing(s);
 
     }
+
+   //keep sending X to server until a valid X is accepted by Server
+   public static void sendingXtoServer(Socket s)throws IOException{
+        while(true){
+            String message = readMessage(s);
+            if(message.equals(X_ACCEPTED_MESSAGE))break;
+            String xString = getXFromConsole();
+            sendMessage(s, xString);
+            }
+    }   
     public static String getXFromConsole() throws IOException{
         String xString = null;
         InputStream in = System.in;
@@ -29,15 +39,8 @@ public class SinglePlayerClient extends SocketAgent{
         }
         return xString;
     }
-    public static void sendingXtoServer(Socket s)throws IOException{
-        while(true){
-            String message = readMessage(s);
-            if(message.equals(X_ACCEPTED_MESSAGE))break;
-            String xString = getXFromConsole();
-            sendMessage(s, xString);
-        }
-    }
-
+ 
+    //making, sending guesses and getting responses from server until winning or lose
     public static void guessing(Socket s) {
         while(true){
             String guess = getGuessCodeString();
@@ -50,6 +53,8 @@ public class SinglePlayerClient extends SocketAgent{
             }
         }
     }
+
+    //making sure server generate secret code before guessing
     public static void  waitToStartGuessing(Socket s){
         while(true){
             String message = null;
@@ -62,6 +67,8 @@ public class SinglePlayerClient extends SocketAgent{
             
         }
     }
+
+    //Getting  guess code from console's input
     private static String getGuessCodeString(){
         String guessCodeString = null;
         try{

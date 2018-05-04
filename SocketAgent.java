@@ -14,6 +14,7 @@ import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+//Storing common  and utility functions used by Clients and Servers
 public  abstract class SocketAgent{
     final static String SERVER_ADDRESS = "127.0.0.1";
     final static int PORT_NUMBER = 1324;
@@ -22,7 +23,7 @@ public  abstract class SocketAgent{
     final static String WIN_MESSAGE = "You won!";
     final static String LOSE_MESSAGE  = "You lost!";
    
-
+    //read and print a String message from socket
     public static String readMessage(Socket s){
         String message  = null;
         try{
@@ -37,6 +38,8 @@ public  abstract class SocketAgent{
         }
         return message;
     }
+    
+    //send string message through socket
     public static void sendMessage(Socket s, String message){
         try{
             PrintWriter out = new PrintWriter(s.getOutputStream(),true);
@@ -48,13 +51,14 @@ public  abstract class SocketAgent{
         
     }
 
-     public static int[] convertStringToIntArray(String line){
+    public static int[] convertStringToIntArray(String line){
         int[] intArray = new int[line.length()];
         for (int i = 0; i<line.length();i++){
             intArray[i] = line.charAt(i)-'0';
         }
         return intArray;  
     }
+    
     public static void quittingOnX(String line){
         if(line.equalsIgnoreCase("x")) {
             System.out.println("Quitting...");
@@ -75,6 +79,8 @@ public  abstract class SocketAgent{
         }  
         return true; 
     } 
+
+    //check if a code in string form contain unquie combo
     public static boolean isUnquie(String codeLine){
         int[] code = convertStringToIntArray(codeLine);
         Set<Integer> setUniqueNumbers = new LinkedHashSet<Integer>();
