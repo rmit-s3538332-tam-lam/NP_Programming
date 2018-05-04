@@ -8,12 +8,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class SinglePlayerClient extends SocketAgent{
-    final static String SERVER_ADDRESS = "127.0.0.1";
-    final static int PORT_ADDRESS = 1324;
+
     public static void main(String[] args) throws UnknownHostException,IOException{
-        Socket cSocket = new Socket(SERVER_ADDRESS,PORT_ADDRESS);
+        Socket cSocket = new Socket(SERVER_ADDRESS,PORT_NUMBER);
         readMessage(cSocket);
         while(true){
+            readMessage(cSocket);
 
         }
     

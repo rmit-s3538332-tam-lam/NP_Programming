@@ -16,6 +16,7 @@ public class SinglePlayerServer {
         int attemptCount = 1;
         play(attemptCount);
         
+        
     }
     private static void play(int attemptCount){
         //server
