@@ -6,22 +6,53 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.stream.IntStream;
+
+import javax.swing.plaf.synth.SynthToolTipUI;
 
 public class SinglePlayerServer {
     static final int PORT_NUMBER = 1324;
     public static void main(String[] args) {
-        int x;
-        // ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
-        // Socket s = serverSocket.accept();
-        // System.out.println("Please enter an integer between 3 - 8:");
-        x = getX();
+        int attemptCount = 1;
+        play(attemptCount);
+        
+    }
+    private static void play(int attemptCount){
+        //server
+        Boolean match = false;
+        int x = getX();
         int[] secretCode = generateSecretCode(x);
         System.out.println("Generated secrete code: " + Arrays.toString(secretCode));
-        String guessCodeString = getGuessCodeString();
 
-
- 
+        while((attemptCount <= 10) && (match!= true)){
+            //server
+            attemptCount+= 1;
+            //client
+            String guessCodeString = getGuessCodeString();
+            //server
+            int[] guessCode = convertStringToIntArray(guessCodeString);
+            System.out.println("Guess secrete code: " + Arrays.toString(guessCode));
+            if(isMatch(secretCode, guessCode)){
+                match = true;
+                break;
+            }
+            System.out.println("Correct position: "+ getCorrectPosition(secretCode, guessCode));
+            System.out.println("Total match position: "+ getTotalMatchPosition(secretCode, guessCode));
+        }
+        if(match == true || attemptCount == 11){
+            System.out.println(getFinalMessage(match ,attemptCount-1, secretCode));
+        }
         
+    }
+    //server
+    private static String getFinalMessage(boolean match, int attemptCount, int[] secretcode){
+        
+        String winOrLose = match? "You won!" : "You lose...";
+        String message = "============================================\n"+
+         winOrLose + "\nNumber of Attempt: "+
+         attemptCount +  "\nSecret code: " + Arrays.toString(secretcode) +
+         "\n============================================";
+        return message;
     }
 
     //use on client side to get x --> send x to server
@@ -53,7 +84,7 @@ public class SinglePlayerServer {
     //generate unqiue combo secret code
     private static int[] generateSecretCode(int size){
         ArrayList<Integer> list = new ArrayList<>(11);
-        for (int i = 0; i <= 10; i++){
+        for (int i = 0; i < 10; i++){
             list.add(i);
         }
         int[] secretCode = new int[size];
@@ -62,6 +93,7 @@ public class SinglePlayerServer {
         }
         return secretCode;
     }
+    //client
     private static String getGuessCodeString(){
         String guessCodeString = null;
         try{
@@ -84,8 +116,60 @@ public class SinglePlayerServer {
         }
         return guessCodeString;
     }
+    //server
+    private static int getCorrectPosition(int[] secretCode,int[] guessCode){
+        int correctPosition  = 0;
+        if(isMatch(secretCode, guessCode)){
+            return secretCode.length;
+        }else{
+            int i = 0;
+            while(i<secretCode.length && i<guessCode.length){
+                if(secretCode[i] == guessCode[i]){
+                    correctPosition++;
+                }
+                i++;
+            }
+        }
+        return correctPosition;
+    }
+    //server
+    private static int getTotalMatchPosition(int[]secretCode,  int[] guessCode){
+        int[] largeTempArray = null;
+        int[] smallTempArray = null;
+        int matchPosition = 0;
+        if (secretCode.length > guessCode.length){
+            largeTempArray = secretCode;
+            smallTempArray  = guessCode;
+        } else{
+            largeTempArray = guessCode;
+            smallTempArray = secretCode;
+        }
+        for(int i = 0; i<largeTempArray.length ; i++){
+            int number = largeTempArray[i];
+            boolean contains = IntStream.of(smallTempArray).anyMatch(x -> x == number);
+            if (contains){
+                matchPosition +=1;
+            }
+        }
+        return matchPosition;
+    }
+    //server
+    private static int getIncorrectPosition(int[] secretCode, int[] guessCode){
+        int totalMatchPosition = getTotalMatchPosition(secretCode, guessCode);
+        int correctPosition = getCorrectPosition(secretCode, guessCode);
+        int incorrectPosition = totalMatchPosition - correctPosition;
+        return incorrectPosition;
+    }
+    //server
+    private static boolean isMatch(int[] secretCode, int[] guessCode){
+        if(Arrays.equals(secretCode, guessCode)) {
+            System.out.println("Matched!!");
+            return true;
+        }
+        return false;
+    }
     
-  
+    
     //////Utils////
     public static int[] convertStringToIntArray(String line){
         int[] intArray = new int[line.length()];
