@@ -178,16 +178,16 @@ public class SinglePlayerServer {
         }
         return intArray;  
     }
-    private static void quittingOnX(String line){
+    public static void quittingOnX(String line){
         if(line.equalsIgnoreCase("x")) {
             System.out.println("Quitting...");
             System.exit(0);
         }
     }
-    private static int convertStringToInt(String valueString) throws NumberFormatException {
+    public static int convertStringToInt(String valueString) throws NumberFormatException {
         return Integer.parseInt(valueString);
     }
-    private static boolean isNumeric(String str){
+    public static boolean isNumeric(String str){
         try  
         {  
           int i = Integer.parseInt(str);  
