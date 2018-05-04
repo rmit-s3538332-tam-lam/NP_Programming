@@ -6,6 +6,8 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.IntStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -16,7 +18,10 @@ public  abstract class SocketAgent{
     final static String SERVER_ADDRESS = "127.0.0.1";
     final static int PORT_NUMBER = 1324;
     final static String X_ACCEPTED_MESSAGE = "Server accepted X";
-    final static String START_GUESSING_MESSAGE = "Secret code generated successfully \n Please enter your guess:";
+    final static String START_GUESSING_MESSAGE = "Please enter your guess";
+    final static String WIN_MESSAGE = "You won!";
+    final static String LOSE_MESSAGE  = "You lost!";
+   
 
     public static String readMessage(Socket s){
         String message  = null;
@@ -24,7 +29,7 @@ public  abstract class SocketAgent{
             BufferedReader inMessage = new BufferedReader(new InputStreamReader(s.getInputStream()));
             String line  = null;
             if((line = inMessage.readLine())!=null){
-                System.out.println("Server: "+ line);
+                System.out.println(line);
                 message = line;
             }
         } catch (IOException e){
@@ -43,7 +48,6 @@ public  abstract class SocketAgent{
         
     }
 
-     //////Utils////
      public static int[] convertStringToIntArray(String line){
         int[] intArray = new int[line.length()];
         for (int i = 0; i<line.length();i++){
@@ -71,5 +75,14 @@ public  abstract class SocketAgent{
         }  
         return true; 
     } 
-
+    public static boolean isUnquie(String codeLine){
+        int[] code = convertStringToIntArray(codeLine);
+        Set<Integer> setUniqueNumbers = new LinkedHashSet<Integer>();
+        for(int x : code) {
+            setUniqueNumbers.add(x);
+        }
+        if(code.length > setUniqueNumbers.size()) return false;
+        return true;
+    }
+    
 }
