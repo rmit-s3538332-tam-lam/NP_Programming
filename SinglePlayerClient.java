@@ -42,7 +42,8 @@ public class SinglePlayerClient extends SocketAgent{
  
     //making, sending guesses and getting responses from server until winning or lose
     public static void guessing(Socket s) {
-        while(true){
+        int  count;
+        for( count = 0; count<10; count++){
             String guess = getGuessCodeString();
             sendMessage(s, guess);
             String message = null;
@@ -51,6 +52,9 @@ public class SinglePlayerClient extends SocketAgent{
                     break;
                 }
             }
+        }
+        if(count == 10){
+            readMessage(s);
         }
     }
 

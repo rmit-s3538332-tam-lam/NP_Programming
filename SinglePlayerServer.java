@@ -37,26 +37,47 @@ public class SinglePlayerServer extends SocketAgent {
     private static void play(Socket s,int[] secretCode){
        
         Boolean match = false;
-        int attemptCount = 1;
+        int attemptCount;
        
-        while(attemptCount<10 && !match){
-            int correctPosition = 0;
-            int incorrectPosition = 0;
-            String  guessCodeString = readMessage(s);
-            int[] guessCode = convertStringToIntArray(guessCodeString);
-            System.out.println("Guess secrete code: " + Arrays.toString(guessCode));
-
-            if(isMatch(secretCode, guessCode)){
-                match =true;
-                break;
+        for (attemptCount = 0;  attemptCount<10; attemptCount++){
+            if(!match){
+                int correctPosition = 0;
+                int incorrectPosition = 0;
+                String  guessCodeString = readMessage(s);
+                int[] guessCode = convertStringToIntArray(guessCodeString);
+                System.out.println("Guess secrete code: " + Arrays.toString(guessCode));
+    
+                if(isMatch(secretCode, guessCode)){
+                    match =true;
+                    break;
+                }
+                correctPosition = getCorrectPosition(secretCode, guessCode);
+                incorrectPosition = getIncorrectPosition(secretCode, guessCode);
+                String hintMessage = "Correct Position: "+ correctPosition  +  
+                "         Incorrect Position: "+ incorrectPosition;
+                sendMessage(s, hintMessage);   
             }
-            correctPosition = getCorrectPosition(secretCode, guessCode);
-            incorrectPosition = getIncorrectPosition(secretCode, guessCode);
-            String hintMessage = "Correct Position: "+ correctPosition  +  
-            "         Incorrect Position: "+ incorrectPosition;
-            sendMessage(s, hintMessage);    
-            attemptCount +=1;
+            
         }
+        // while(attemptCount<=10 && !match){
+        //     int correctPosition = 0;
+        //     int incorrectPosition = 0;
+        //     String  guessCodeString = readMessage(s);
+        //     int[] guessCode = convertStringToIntArray(guessCodeString);
+        //     System.out.println("Guess secrete code: " + Arrays.toString(guessCode));
+
+        //     if(isMatch(secretCode, guessCode)){
+        //         match =true;
+        //         break;
+        //     }
+        //     correctPosition = getCorrectPosition(secretCode, guessCode);
+        //     incorrectPosition = getIncorrectPosition(secretCode, guessCode);
+        //     String hintMessage = "Correct Position: "+ correctPosition  +  
+        //     "         Incorrect Position: "+ incorrectPosition;
+        //     sendMessage(s, hintMessage);   
+        //     if(attemptCount == 10)break; 
+        //     attemptCount +=1;
+        // }
         sendWinOrLoseMessage(s, match, attemptCount, secretCode);
 
     }
