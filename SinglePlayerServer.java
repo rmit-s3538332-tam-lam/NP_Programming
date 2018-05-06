@@ -39,7 +39,7 @@ public class SinglePlayerServer extends SocketAgent {
         Boolean match = false;
         int attemptCount;
        
-        for (attemptCount = 0;  attemptCount<10; attemptCount++){
+        for (attemptCount = 1;  attemptCount<=10; attemptCount++){
             if(!match){
                 int correctPosition = 0;
                 int incorrectPosition = 0;
@@ -59,32 +59,17 @@ public class SinglePlayerServer extends SocketAgent {
             }
             
         }
-        // while(attemptCount<=10 && !match){
-        //     int correctPosition = 0;
-        //     int incorrectPosition = 0;
-        //     String  guessCodeString = readMessage(s);
-        //     int[] guessCode = convertStringToIntArray(guessCodeString);
-        //     System.out.println("Guess secrete code: " + Arrays.toString(guessCode));
-
-        //     if(isMatch(secretCode, guessCode)){
-        //         match =true;
-        //         break;
-        //     }
-        //     correctPosition = getCorrectPosition(secretCode, guessCode);
-        //     incorrectPosition = getIncorrectPosition(secretCode, guessCode);
-        //     String hintMessage = "Correct Position: "+ correctPosition  +  
-        //     "         Incorrect Position: "+ incorrectPosition;
-        //     sendMessage(s, hintMessage);   
-        //     if(attemptCount == 10)break; 
-        //     attemptCount +=1;
-        // }
         sendWinOrLoseMessage(s, match, attemptCount, secretCode);
 
     }
     // a result message to send after game is concluded
     private static void  sendWinOrLoseMessage(Socket s, Boolean match, int attemptCount, int[] secretCode){
-        String message =  match? WIN_MESSAGE : LOSE_MESSAGE;
-        message += " Secret code: "+ Arrays.toString(secretCode) + "     Attempt count: "+ attemptCount;
+        String message;
+        if(match){
+            message  = WIN_MESSAGE  + " Secret code: "+ Arrays.toString(secretCode) + "     Attempt count: "+ attemptCount;
+        }  else{
+            message = LOSE_MESSAGE +" Secret code: "+ Arrays.toString(secretCode) + "     Attempt count: "+ (attemptCount-1);
+        }
         System.out.println(message);
         sendMessage(s, message);
     }
