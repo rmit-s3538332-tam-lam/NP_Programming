@@ -32,9 +32,13 @@ public  abstract class SocketAgent{
     final static String X_ACCEPTED = "X_ACCEPTED";
     final static String SECRET_CODE_GENERATED = "SECRET_CODE_GENERATED";
     final static String HINT_MESSAGE = "HINT_MESSAGE";
-    final static String START_GAME = "START_GAME";
+    final static String SUBMIT_GUESS = "SUBMIT_GUESS";
     final static String FINISH_PLAYING = "FINISH_PLAYING";
     final static String GAME_ENDED = "GAME_ENDED";
+    final static String FORFEIT = "f";
+    final static int FORFEIT_ATTEMPT_COUNT = 11;
+
+
 
 
 
