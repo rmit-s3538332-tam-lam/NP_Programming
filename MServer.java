@@ -29,6 +29,9 @@ public class MServer extends SocketAgent {
     // true: player has finished the game
     private static boolean[] isPlayersFinish = new boolean[PLAYER_COUNT];
 
+    //has all players in 1 round made final  choice to quit or  replay
+    private static boolean[] hasFinalChoices = new boolean[PLAYER_COUNT];
+
     public static void main(String[] args) throws IOException {
         System.out.println("Server is running...");
         ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
@@ -65,39 +68,63 @@ public class MServer extends SocketAgent {
                 System.out.println("New client is connected...");
                 in = new BufferedReader(new InputStreamReader(s.getInputStream()));
                 out = new PrintWriter(s.getOutputStream(), true);
-
                 // getting player name and add it to playerQueue
                 playerName = getPlayerNameFromClient(s);
-                addPlayerToQueue(playerName);
 
-                waitToJoinGame();
-                System.out.println("Player: " + playerName + " joined game");
+                while (true) {
+                    addPlayerToQueue(playerName);
+                    waitToJoinGame();
+                    System.out.println("Player: " + playerName + " joined game");
 
-                gettingX();
-                System.out.println("X accepted: " + x);
+                    gettingX();
+                    System.out.println("X accepted: " + x);
 
-                gettingSecretCode();
-                System.out.println(playerName + ": Generated secret code: " + Arrays.toString(secretCode));
+                    gettingSecretCode();
+                    System.out.println(playerName + ": Generated secret code: " + Arrays.toString(secretCode));
 
-                play();
+                    play();
 
-                udpateIsPlayersFinish(playerName, true);
-                System.out.println(playerName + ":has finished the game");
-                waitForOtherPlayerToFinish();
-                System.out.println("Everyone has finish their game");
-                out.println(EVERYONE_FINISHED);
-                announceRanking();
-                replayPromting();
-                System.out.println("Replay: " + replay);
+                    udpateIsPlayersFinish(playerName, true);
+                    System.out.println(playerName + ":has finished the game");
+                    waitForOtherPlayerToFinish();
+                    System.out.println("Everyone has finish their game");
+                    out.println(EVERYONE_FINISHED);
+                    announceRanking();
+                    replayPromting();
+                    updateHasFinalChoice(playerName, true);
+                    System.out.println("Replay: " + replay);
+                    System.out.println("Waiting for other players to make responses...");
+                    while(true){
+                        if( haveAllPlayerMakeFinalChoice()){
+                            if (replay) {
+                                System.out.println("Replaying..");
+                                synchronized (playerNames) {
+                                    playerNames.remove(playerName);
+                                }
+                                attemptCounts = new int[PLAYER_COUNT];
+                                isPlayersFinish = new boolean[PLAYER_COUNT];
+                                hasFinalChoices = new boolean[PLAYER_COUNT];
+                                x =  0;
+                                secretCode  = new int[x];
+                                break;
+                            }
+                            if (!replay) {
+                                System.out.println("No replay");
+                                return;
+                            }
+                        }
+                    }
+
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
                 if (playerName != null) {
-                    // playerNames.remove(playerName);
+                    playerNames.remove(playerName);
                 }
-                // attemptCounts = new int[PLAYER_COUNT];
-                // isPlayersFinish = new boolean[PLAYER_COUNT];
+                attemptCounts = new int[PLAYER_COUNT];
+                isPlayersFinish = new boolean[PLAYER_COUNT];
                 try {
                     s.close();
                 } catch (IOException e) {
@@ -107,6 +134,18 @@ public class MServer extends SocketAgent {
 
         }
 
+        public boolean haveAllPlayerMakeFinalChoice(){
+            for(int i = 0;i< hasFinalChoices.length;i++){
+                if(!hasFinalChoices[i]){
+                    return false;
+                }
+            }
+            return true;
+        }
+        public void updateHasFinalChoice(String playerName,boolean boo){
+            int index = getPlayerIndex(playerName);
+            hasFinalChoices[index] = boo;
+        }
         public void replayPromting() throws IOException {
             System.out.println("Prompting client to replay:");
             out.println(REPLAY_PROMPT);
@@ -115,13 +154,13 @@ public class MServer extends SocketAgent {
                 line = in.readLine();
                 if (line != null) {
                     if (line.equals(QUIT)) {
-                        System.out.println(playerName+ " : choose to replay");
+                        System.out.println(playerName + " : choose to quit");
                         replay = false;
                         return;
                     }
                     if (line.equals(REPLAY)) {
                         replay = true;
-                        System.out.println(playerName+ " : choose to replay");
+                        System.out.println(playerName + " : choose to replay");
                         return;
                     }
                 }
@@ -182,7 +221,6 @@ public class MServer extends SocketAgent {
                     e.printStackTrace();
                 }
                 if (isAllPlayerFinishPlaying()) {
-                    System.out.println(playerName + ": somebody hasn't  finish with  their game ...");
                     return;
                 }
 
@@ -193,14 +231,14 @@ public class MServer extends SocketAgent {
             int[] sortedAttemptCounts = attemptCounts;
             String[] sortedPlayerNames = new String[PLAYER_COUNT];
             Arrays.sort(sortedAttemptCounts);
-            if(sortedAttemptCounts.length ==1){
-                sortedPlayerNames[0] =  playerNames.get(0);
-            }else{
+            if (playerNames.size() == 1) {
+                sortedPlayerNames[0] = playerName;
+            } else {
                 for (int i = 0; i < sortedAttemptCounts.length; i++) {
-                    sortedPlayerNames[i] = playerNames.get(i);
+                    sortedPlayerNames[i] = playerNames.get(i).toString();
                 }
             }
-            
+
             System.out.println(Arrays.toString(sortedAttemptCounts));
             System.out.println(Arrays.toString(sortedPlayerNames));
             out.println(FINAL_RANKING);
@@ -321,7 +359,6 @@ public class MServer extends SocketAgent {
                     out.println(X_ACCEPTED);
                     return;
                 }
-
                 try {
                     Thread.sleep(SLEEP_MILLISECOND);
                 } catch (InterruptedException e) {
@@ -354,6 +391,7 @@ public class MServer extends SocketAgent {
                     e.printStackTrace();
                 }
             }
+
         }
 
         // get player count in a single game

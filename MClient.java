@@ -13,27 +13,34 @@ public class MClient extends SocketAgent {
     private BufferedReader in;
     private PrintWriter out;
     private BufferedReader consoleIn;
-
+    private boolean replay;
     public static void main(String[] args) throws UnknownHostException, IOException {
         MClient client = new MClient();
         client.run();
     }
 
     public void run() throws IOException {
+        
         Socket s = new Socket(SERVER_ADDRESS, PORT_NUMBER);
         consoleIn  = new BufferedReader(new InputStreamReader(System.in));
         in = new BufferedReader(new InputStreamReader(s.getInputStream()));
         out = new PrintWriter(s.getOutputStream(), true);
         sendingPlayerName();
-        waitToJoinGame();
-        gettingX();
-        waitForSecretCode();
-        System.out.println("Start guessing...");
-        guesssing();
-        waitForToEveryoneFinish();
-        readingRanking();
-        replayPrompt();
-        System.out.println("aefafa");
+        while(true){
+            waitToJoinGame();
+            gettingX();
+            waitForSecretCode();
+            System.out.println("Start guessing...");
+            guesssing();
+            waitForToEveryoneFinish();
+            readingRanking();
+            replayPrompt();
+            if(!replay){
+                return;
+            }
+            System.out.println("test reach");
+        }
+   
     }
     private void waitForToEveryoneFinish() throws IOException{
         String line;
@@ -87,12 +94,14 @@ public class MClient extends SocketAgent {
             System.out.println("Enter p to replay, q to quit: ");
             if((line = consoleIn.readLine())!=null){
                 if(line.equalsIgnoreCase("p")){
+                    replay = true;
                     out.println(REPLAY);
                     System.out.println("Re-entered queue");
                     return;
                 }
                 if(line.equalsIgnoreCase("q")){
                     out.println(QUIT);
+                    replay = false;
                     System.out.println("Quitting");
                     return;
                 }
