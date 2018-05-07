@@ -17,7 +17,7 @@ import java.net.Socket;
 //Storing common  and utility functions used by Clients and Servers
 public  abstract class SocketAgent{
     final static String SERVER_ADDRESS = "127.0.0.1";
-    final static int PORT_NUMBER = 1324;
+    final static int PORT_NUMBER = 6073;
     final static String X_ACCEPTED_MESSAGE = "Server accepted X";
     final static String START_GUESSING_MESSAGE = "Please enter your guess";
     final static String WIN_MESSAGE = "You won!";
@@ -31,6 +31,14 @@ public  abstract class SocketAgent{
     final static String SUBMIT_X = "SUBMIT_X";
     final static String X_ACCEPTED = "X_ACCEPTED";
     final static String SECRET_CODE_GENERATED = "SECRET_CODE_GENERATED";
+    final static String HINT_MESSAGE = "HINT_MESSAGE";
+    final static String START_GAME = "START_GAME";
+    final static String FINISH_PLAYING = "FINISH_PLAYING";
+    final static String GAME_ENDED = "GAME_ENDED";
+
+
+
+
     
 
 
