@@ -34,7 +34,11 @@ public  abstract class SocketAgent{
     final static String HINT_MESSAGE = "HINT_MESSAGE";
     final static String SUBMIT_GUESS = "SUBMIT_GUESS";
     final static String FINISH_PLAYING = "FINISH_PLAYING";
-    final static String GAME_ENDED = "GAME_ENDED";
+    final static String FINAL_RANKING = "FINAL_RANKING";
+    final static String EVERYONE_FINISHED = "EVERYONE_FINISHED";
+    final static String REPLAY_PROMPT = "REPLAY_PROMPT";
+
+
     final static String FORFEIT = "f";
     final static int FORFEIT_ATTEMPT_COUNT = 11;
 

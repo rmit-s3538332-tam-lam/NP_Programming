@@ -28,27 +28,43 @@ public class MClient extends SocketAgent {
         waitForSecretCode();
         System.out.println("Start guessing...");
         guesssing();
-
+        waitForToEveryoneFinish();
+        readingRanking();
     }
-
-    // //making, sending guesses and getting responses from server until winning or
-    // lose
-    // public static void guessing(Socket s) {
-    // int count;
-    // for( count = 0; count<10; count++){
-    // String guess = getGuessCodeString();
-    // sendMessage(s, guess);
-    // String message = null;
-    // if((message = readMessage(s))!=null){
-    // if (message.contains(WIN_MESSAGE)|| message.contains(LOSE_MESSAGE)){
-    // break;
-    // }
-    // }
-    // }
-    // if(count == 10){
-    // readMessage(s);
-    // }
-    // }
+    private void waitForToEveryoneFinish() throws IOException{
+        String line;
+        while(true){
+            line = in.readLine();
+            if(line.equals(EVERYONE_FINISHED)){
+                System.out.println("Everyone has finished their game");
+                return;
+            }
+            try{
+                Thread.sleep(SLEEP_MILLISECOND);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+        }   
+    }
+    private void readingRanking() throws IOException{
+        String line;
+        while(true){
+            line =in.readLine();
+            if(line!= null){
+                if(line.equals(FINAL_RANKING)){
+                    System.out.println(in.readLine());
+                    System.out.println(in.readLine());
+                    int count = 0;
+                    while(count<PLAYER_COUNT){
+                        System.out.println(in.readLine());
+                        count++;
+                    }
+                    System.out.println(in.readLine());
+                }
+            }
+            
+        }
+    }
     private void guesssing() throws IOException {
         String line;
         while (true) {

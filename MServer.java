@@ -84,6 +84,7 @@ public class MServer extends SocketAgent {
                 System.out.println(playerName + ":has finished the game");
                 waitForOtherPlayerToFinish();
                 System.out.println("Everyone has finish their game");
+                out.println(EVERYONE_FINISHED);
                 announceRanking();
                 // //play game
                 // //finish game --> wait for other players to finish game.
@@ -103,8 +104,8 @@ public class MServer extends SocketAgent {
                 if (playerName != null) {
                     // playerNames.remove(playerName);
                 }
-                attemptCounts = new int[PLAYER_COUNT];
-                isPlayersFinish = new boolean[PLAYER_COUNT];
+                // attemptCounts = new int[PLAYER_COUNT];
+                // isPlayersFinish = new boolean[PLAYER_COUNT];
                 try {
                     s.close();
                 } catch (IOException e) {
@@ -113,7 +114,9 @@ public class MServer extends SocketAgent {
             }
 
         }
-
+        public void replayPromting()throws IOException{
+            out.println(REPLAY_PROMPT);
+        }
         public void play() throws IOException {
             Boolean match = false;
             boolean isForfeited = false;
@@ -162,17 +165,54 @@ public class MServer extends SocketAgent {
         public void waitForOtherPlayerToFinish() {
             System.out.println(playerName + ": waiting for other players to finish game...");
             while (true) {
-                Thread.sleep(SLEEP_MILLISECOND);
-                if (isAllPlayerFinishPlaying())
+                try {
+                    Thread.sleep(SLEEP_MILLISECOND);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (isAllPlayerFinishPlaying()){
+                    System.out.println(playerName + ": somebody hasn't  finish with  their game ...");
                     return;
+                }
+                
             }
         }
 
         public String announceRanking() {
             int[] sortedAttemptCounts = attemptCounts;
+            String[] sortedPlayerNames = new String[PLAYER_COUNT];
             Arrays.sort(sortedAttemptCounts);
+            for(int i = 0; i< sortedAttemptCounts.length;i++){
+                sortedPlayerNames[i] = playerNames.get(i).toString();
+            }
             System.out.println(Arrays.toString(sortedAttemptCounts));
+            System.out.println(Arrays.toString(sortedPlayerNames));
+            out.println(FINAL_RANKING);
+            out.println("====================================");
+            out.println("Ranking:");
+            String message = "====================================\n"+
+            "Ranking: \n";
+            for(int i = 0; i< PLAYER_COUNT;i++){
+                String name = sortedPlayerNames[i];
+                int count = sortedAttemptCounts[i];
+                String line = (i+1)+ ". " + name + ", " + count+ " attempts";
+                out.println(line);
+                message+= line+ "\n"; 
+            }
+            out.println("====================================");
+            message += "====================================\n";
+            System.out.println(message);
             return "";
+        }
+
+        public int getIndexFromAttemptCount(int count) {
+            int playerIndex = 0;
+            for (int i = 0; i < attemptCounts.length; i++) {
+                if (attemptCounts[i] == count) {
+                    playerIndex = i;
+                }
+            }
+            return playerIndex;
         }
 
         // send a indivisual summary message after player finish game
