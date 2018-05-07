@@ -24,8 +24,20 @@ public class MClient extends SocketAgent {
         out = new PrintWriter(s.getOutputStream(), true);
         sendingPlayerName();
         waitToJoinGame();
-        
-        // geting x if first player
+        gettingX();
+
+        while(true){
+            System.out.println("Waiting for secret code to be generated...");
+            String line = in.readLine();
+            if(line.equals(SECRET_CODE_GENERATED)){
+                System.out.println("Secret code is successfully generated. Starting game");
+                break;
+            }
+        }
+
+    }
+    //getting X from first player
+    private void gettingX() throws IOException{
         while(true){
             String line = in.readLine();
             if(line.equals(SUBMIT_X)){
@@ -38,9 +50,7 @@ public class MClient extends SocketAgent {
                 break;
             }
         }
-
     }
-
     private void waitToJoinGame() throws IOException {
         while (true) {
             String line = in.readLine();

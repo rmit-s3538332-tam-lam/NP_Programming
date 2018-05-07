@@ -30,6 +30,8 @@ public  abstract class SocketAgent{
     final static int SLEEP_MILLISECOND = 7000;
     final static String SUBMIT_X = "SUBMIT_X";
     final static String X_ACCEPTED = "X_ACCEPTED";
+    final static String SECRET_CODE_GENERATED = "SECRET_CODE_GENERATED";
+    
 
 
    

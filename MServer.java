@@ -16,6 +16,7 @@ import java.util.Queue;
 public class MServer extends SocketAgent {
     private static ArrayList<String> playerNames = new ArrayList<String>();
     private static int x;
+    private static int[] secretCode;
 
     public static void main(String[] args) throws IOException {
         System.out.println("Server is running...");
@@ -56,44 +57,40 @@ public class MServer extends SocketAgent {
                 // getting player name and add it to playerQueue
                 playerName = getPlayerNameFromClient(s);
                 addPlayerToQueue(playerName);
-                
-                //waiting to  join game
+
                 waitToJoinGame();
                 System.out.println("Player: " + playerName + " joined game");
 
-                //if  playerName == playerNames[0] --> get X
-                //get valid X --> generate secrete code --> SECRETE CODE VALID
-                //else wait for x
-                while(true){
-                    System.out.println("Getting X");
-                    if(playerName == playerNames.get(0)){
-                        System.out.println("Getting X from first player: "+ playerName + " ....");
-                        out.println(SUBMIT_X);
-                        String line = in.readLine();
-                        if(line != null){
-                            if(isNumeric(line)){
-                                if(convertStringToInt(line) >= 3  && convertStringToInt(line)<=8){
-                                    setX(convertStringToInt(line));
-                                    System.out.println("Selected X: "+  x);
-                                    out.println(X_ACCEPTED);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    if(x!= 0){
-                        out.println(X_ACCEPTED);
-                    }
+                gettingX();
+                System.out.println("X accepted: " + x);
 
+                // while 
+                //if firts player --> generate secret code
+                // if secret code is not empty --> out.println(...)
+                //break;
+                //client : wait until server generate secret code
+                
+                while (true) {
+                    //First player's server thread generate secrete code
+                    if(playerName.equals(playerNames.get(0))){
+                        secretCode =  generateSecretCode(x);
+                        System.out.println("Secret code is successfully generated");
+                        System.out.println("Generated secret code: " + Arrays.toString(secretCode));
+                        out.println(SECRET_CODE_GENERATED);
+                        return;
+                    }
+                    //other player wait until code is generated
+                    if(secretCode != null||secretCode.length!= 0){
+                        System.out.println("Secret code is successfully generated");
+                        out.println(SECRET_CODE_GENERATED);
+                    }
                     try{
                         Thread.sleep(SLEEP_MILLISECOND);
-                    }catch (InterruptedException e){
-                        e.printStackTrace();;
+                    }catch(InterruptedException e){
+                        e.printStackTrace();
                     }
+
                 }
-
-
-                
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -108,34 +105,69 @@ public class MServer extends SocketAgent {
                 }
             }
 
-        }  
-        private synchronized void setX(int val){
+        }
+
+        // if client is the first player, get X from client
+        private void gettingX() throws IOException {
+            while (true) {
+                System.out.println("Getting X");
+                if (playerName == playerNames.get(0)) {
+                    System.out.println("Getting X from first player: " + playerName + " ....");
+                    out.println(SUBMIT_X);
+                    String line = in.readLine();
+                    if (line != null) {
+                        if (isNumeric(line)) {
+                            if (convertStringToInt(line) >= 3 && convertStringToInt(line) <= 8) {
+                                setX(convertStringToInt(line));
+                                System.out.println("Selected X: " + x);
+                                out.println(X_ACCEPTED);
+                                return;
+                            }
+                        }
+                    }
+                }
+                if (x != 0) {
+                    out.println(X_ACCEPTED);
+                }
+
+                try {
+                    Thread.sleep(SLEEP_MILLISECOND);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    ;
+                }
+            }
+        }
+
+        private synchronized void setX(int val) {
             x = val;
         }
-        private void waitToJoinGame(){
-            while(true){
+
+        private void waitToJoinGame() {
+            while (true) {
                 int playerCount = getPlayerCount();
-                for(int i = 0; i<playerCount ; i++){
+                for (int i = 0; i < playerCount; i++) {
                     String name = playerNames.get(i);
-                    if(playerName.equals(name)){
-                        System.out.println("Player is going joinning game: "+ playerName);
-                        out.println(JOIN_GAME); 
+                    if (playerName.equals(name)) {
+                        System.out.println("Player is going joinning game: " + playerName);
+                        out.println(JOIN_GAME);
                         return;
                     }
                 }
                 out.println(WAIT_FOR_GAME);
                 System.out.println("Waiting...");
-                try{
+                try {
                     Thread.sleep(SLEEP_MILLISECOND);
-                }catch (InterruptedException e){
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            } 
+            }
         }
-        //get player count in a single game
-        public int getPlayerCount(){
+
+        // get player count in a single game
+        public int getPlayerCount() {
             int playerCount = 0;
-            playerCount = playerNames.size()<PLAYER_COUNT? playerNames.size(): PLAYER_COUNT;
+            playerCount = playerNames.size() < PLAYER_COUNT ? playerNames.size() : PLAYER_COUNT;
             return playerCount;
         }
 
@@ -159,9 +191,23 @@ public class MServer extends SocketAgent {
         public void addPlayerToQueue(String playerName) {
             synchronized (playerNames) {
                 playerNames.add(playerName);
-                if(playerNames.contains(playerName)){
+                if (playerNames.contains(playerName)) {
                 }
             }
         }
+
+        // generate unquie secret code
+        private static int[] generateSecretCode(int size) {
+            ArrayList<Integer> list = new ArrayList<>(11);
+            for (int i = 0; i < 10; i++) {
+                list.add(i);
+            }
+            int[] secretCode = new int[size];
+            for (int count = 0; count < size; count++) {
+                secretCode[count] = list.remove((int) (Math.random() * list.size()));
+            }
+            return secretCode;
+        }
+
     }
 }
