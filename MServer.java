@@ -64,33 +64,9 @@ public class MServer extends SocketAgent {
                 gettingX();
                 System.out.println("X accepted: " + x);
 
-                // while 
-                //if firts player --> generate secret code
-                // if secret code is not empty --> out.println(...)
-                //break;
-                //client : wait until server generate secret code
-                
-                while (true) {
-                    //First player's server thread generate secrete code
-                    if(playerName.equals(playerNames.get(0))){
-                        secretCode =  generateSecretCode(x);
-                        System.out.println("Secret code is successfully generated");
-                        System.out.println("Generated secret code: " + Arrays.toString(secretCode));
-                        out.println(SECRET_CODE_GENERATED);
-                        return;
-                    }
-                    //other player wait until code is generated
-                    if(secretCode != null||secretCode.length!= 0){
-                        System.out.println("Secret code is successfully generated");
-                        out.println(SECRET_CODE_GENERATED);
-                    }
-                    try{
-                        Thread.sleep(SLEEP_MILLISECOND);
-                    }catch(InterruptedException e){
-                        e.printStackTrace();
-                    }
+                gettingSecretCode();
+                System.out.println("Generated secret code: " + Arrays.toString(secretCode));
 
-                }
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -103,6 +79,31 @@ public class MServer extends SocketAgent {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+
+        }
+
+
+        private void gettingSecretCode() {
+            while (true) {
+                // First player's server thread generate secrete code
+                if (playerName.equals(playerNames.get(0))) {
+                    secretCode = generateSecretCode(x);
+                    System.out.println("Secret code is successfully generated");
+                    out.println(SECRET_CODE_GENERATED);
+                    return;
+                }
+                // other player wait until code is generated
+                if (secretCode != null || secretCode.length != 0) {
+                    System.out.println("Secret code is successfully generated");
+                    out.println(SECRET_CODE_GENERATED);
+                }
+                try {
+                    Thread.sleep(SLEEP_MILLISECOND);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
             }
 
         }
