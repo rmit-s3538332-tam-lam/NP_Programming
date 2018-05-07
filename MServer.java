@@ -18,9 +18,16 @@ public class MServer extends SocketAgent {
     private static ArrayList<String> playerNames = new ArrayList<String>();
     private static int x = 0;
     private static boolean isXValid = false;
+
     private static int[] secretCode;
+
+    // Strong attempt count for player (1-3) in current game
     private static int[] attemptCounts = new int[PLAYER_COUNT];
-    private static boolean[] isFinishPlaying = new boolean[PLAYER_COUNT];
+
+    // Array storing players status in current game
+    // false: player still playing
+    // true: player has finished the game
+    private static boolean[] isPlayersFinish = new boolean[PLAYER_COUNT];
 
     public static void main(String[] args) throws IOException {
         System.out.println("Server is running...");
@@ -71,67 +78,15 @@ public class MServer extends SocketAgent {
                 gettingSecretCode();
                 System.out.println(playerName + ": Generated secret code: " + Arrays.toString(secretCode));
 
-                // each client play game
-                // have 10 attempt
-                // if win --> send out.println ("Win");
-                //
-                Boolean match = false;
-                boolean isForfeited = false;
-                int attemptCount;
+                play();
 
-                for (attemptCount = 1; attemptCount <= 10; attemptCount++) {
-                    if (!match) {
-                        int correctPosition = 0;
-                        int incorrectPosition = 0;
-                        out.println(SUBMIT_GUESS);
-                        String guessCodeString = in.readLine();
-                        if (guessCodeString.equals(FORFEIT)) {
-                            System.out.println(playerName + ": forfeit game");
-                            isForfeited = true;
-                            System.out.println("Forfeit:" + isForfeited);
-                            updateAttemptCount(playerName, FORFEIT_ATTEMPT_COUNT);
-                            break;
-                        }
-                        int[] guessCode = convertStringToIntArray(guessCodeString);
-                        System.out.println("Guess secrete code: " + Arrays.toString(guessCode));
-
-                        if (isMatch(secretCode, guessCode)) {
-                            match = true;
-                            updateAttemptCount(playerName, attemptCount);
-                            break;
-                        }
-                        correctPosition = getCorrectPosition(secretCode, guessCode);
-                        incorrectPosition = getIncorrectPosition(secretCode, guessCode);
-                        String hintMessage = "Correct Position: " + correctPosition + "         Incorrect Position: "
-                                + incorrectPosition;
-                        out.println(HINT_MESSAGE);
-                        out.println(hintMessage);
-                        updateAttemptCount(playerName, attemptCount);
-                    }
-                }
-                // last iteration
-                if (attemptCount == 11 && !isForfeited) {
-                    System.out.println("LOSe 10 update");
-                    attemptCount -= 1;
-                    updateAttemptCount(playerName, attemptCount);
-                }
-                int playerIndex = getPlayerIndex(playerName);
-                out.println(FINISH_PLAYING);
-                sendWinOrLoseMessage(s, match, attemptCounts[playerIndex], secretCode);
-
+                udpateIsPlayersFinish(playerName, true);
+                System.out.println(playerName + ":has finished the game");
+                waitForOtherPlayerToFinish();
+                System.out.println("Everyone has finish their game");
+                announceRanking();
                 // //play game
                 // //finish game --> wait for other players to finish game.
-                // while(true){
-                // System.out.println("Waiting for other players to finish game...");
-                // String line = in.readLine();
-                // if(line!= null){
-                // if(line.equals(FINISH_PLAYING)){
-                // System.out.println("Player: "+ playerName+ " has finish playing");
-                // updateIsFinishPlaying(playerName,true);
-                // break;
-                // }
-                // }
-                // }
 
                 // //wait for all player to finish playing
                 // while(true){
@@ -149,7 +104,7 @@ public class MServer extends SocketAgent {
                     // playerNames.remove(playerName);
                 }
                 attemptCounts = new int[PLAYER_COUNT];
-                isFinishPlaying = new boolean[PLAYER_COUNT];
+                isPlayersFinish = new boolean[PLAYER_COUNT];
                 try {
                     s.close();
                 } catch (IOException e) {
@@ -159,6 +114,68 @@ public class MServer extends SocketAgent {
 
         }
 
+        public void play() throws IOException {
+            Boolean match = false;
+            boolean isForfeited = false;
+            int attemptCount;
+            for (attemptCount = 1; attemptCount <= 10; attemptCount++) {
+                if (!match) {
+                    int correctPosition = 0;
+                    int incorrectPosition = 0;
+                    out.println(SUBMIT_GUESS);
+                    String guessCodeString = in.readLine();
+                    if (guessCodeString.equals(FORFEIT)) {
+                        System.out.println(playerName + ": forfeit game");
+                        isForfeited = true;
+                        System.out.println("Forfeit:" + isForfeited);
+                        updateAttemptCount(playerName, FORFEIT_ATTEMPT_COUNT);
+                        break;
+                    }
+                    int[] guessCode = convertStringToIntArray(guessCodeString);
+                    System.out.println("Guess secrete code: " + Arrays.toString(guessCode));
+
+                    if (isMatch(secretCode, guessCode)) {
+                        match = true;
+                        updateAttemptCount(playerName, attemptCount);
+                        break;
+                    }
+                    correctPosition = getCorrectPosition(secretCode, guessCode);
+                    incorrectPosition = getIncorrectPosition(secretCode, guessCode);
+                    String hintMessage = "Correct Position: " + correctPosition + "         Incorrect Position: "
+                            + incorrectPosition;
+                    out.println(HINT_MESSAGE);
+                    out.println(hintMessage);
+                    updateAttemptCount(playerName, attemptCount);
+                }
+            }
+            // last iteration
+            if (attemptCount == 11 && !isForfeited) {
+                System.out.println("LOSe 10 update");
+                attemptCount -= 1;
+                updateAttemptCount(playerName, attemptCount);
+            }
+            int playerIndex = getPlayerIndex(playerName);
+            out.println(FINISH_PLAYING);
+            sendWinOrLoseMessage(s, match, attemptCounts[playerIndex], secretCode);
+        }
+
+        public void waitForOtherPlayerToFinish() {
+            System.out.println(playerName + ": waiting for other players to finish game...");
+            while (true) {
+                Thread.sleep(SLEEP_MILLISECOND);
+                if (isAllPlayerFinishPlaying())
+                    return;
+            }
+        }
+
+        public String announceRanking() {
+            int[] sortedAttemptCounts = attemptCounts;
+            Arrays.sort(sortedAttemptCounts);
+            System.out.println(Arrays.toString(sortedAttemptCounts));
+            return "";
+        }
+
+        // send a indivisual summary message after player finish game
         private void sendWinOrLoseMessage(Socket s, Boolean match, int attemptCount, int[] secretCode) {
             String message;
             if (match) {
@@ -176,7 +193,7 @@ public class MServer extends SocketAgent {
         private boolean isAllPlayerFinishPlaying() {
             int playerCount = getPlayerCount();
             for (int i = 0; i < playerCount; i++) {
-                if (isFinishPlaying[i] = false) {
+                if (isPlayersFinish[i] == false) {
                     return false;
                 }
             }
@@ -192,10 +209,10 @@ public class MServer extends SocketAgent {
         }
 
         // Update status of current player in game
-        private void updateIsFinishPlaying(String playerName, boolean boo) {
-            synchronized (isFinishPlaying) {
+        private void udpateIsPlayersFinish(String playerName, boolean boo) {
+            synchronized (isPlayersFinish) {
                 int playerIndex = getPlayerIndex(playerName);
-                isFinishPlaying[playerIndex] = boo;
+                isPlayersFinish[playerIndex] = boo;
             }
         }
         // a result message to send after game is concluded

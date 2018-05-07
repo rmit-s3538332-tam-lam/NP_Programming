@@ -59,7 +59,7 @@ public class MClient extends SocketAgent {
                 ;
             }
             if (line.equals(FINISH_PLAYING)) {
-                System.out.println("FINISH game");
+                System.out.println("Finish game");
                 System.out.println(in.readLine());
                 return;
             }

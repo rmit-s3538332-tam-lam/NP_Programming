@@ -16,6 +16,7 @@ import java.net.Socket;
 
 //Storing common  and utility functions used by Clients and Servers
 public  abstract class SocketAgent{
+    final static int PLAYER_COUNT = 2;
     final static String SERVER_ADDRESS = "127.0.0.1";
     final static int PORT_NUMBER = 6073;
     final static String X_ACCEPTED_MESSAGE = "Server accepted X";
@@ -26,8 +27,7 @@ public  abstract class SocketAgent{
     final static String SUBMIT_NAME = "SUBMIT_NAME";
     final static String JOIN_GAME = "JOIN_GAME";
     final static String WAIT_FOR_GAME = "WAIT_FOR_GAME";
-    final static int PLAYER_COUNT = 2;
-    final static int SLEEP_MILLISECOND = 7000;
+    final static int SLEEP_MILLISECOND = 3000;
     final static String SUBMIT_X = "SUBMIT_X";
     final static String X_ACCEPTED = "X_ACCEPTED";
     final static String SECRET_CODE_GENERATED = "SECRET_CODE_GENERATED";
@@ -38,15 +38,6 @@ public  abstract class SocketAgent{
     final static String FORFEIT = "f";
     final static int FORFEIT_ATTEMPT_COUNT = 11;
 
-
-
-
-
-
-    
-
-
-   
     //read and print a String message from socket
     public static String readMessage(Socket s){
         String message  = null;
