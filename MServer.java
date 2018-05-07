@@ -14,7 +14,8 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 public class MServer extends SocketAgent {
-    private static HashSet<String> playerNames = new HashSet<String>();
+    private static ArrayList<String> playerNames = new ArrayList<String>();
+    private static int x;
 
     public static void main(String[] args) throws IOException {
         System.out.println("Server is running...");
@@ -38,6 +39,7 @@ public class MServer extends SocketAgent {
         private BufferedReader in;
         private PrintWriter out;
         private Socket s;
+        private int x;
 
         public ClientThread(Socket s) {
 
@@ -52,10 +54,46 @@ public class MServer extends SocketAgent {
                 out = new PrintWriter(s.getOutputStream(), true);
 
                 // getting player name and add it to playerQueue
-                String playerName = getPlayerNameFromClient(s);
+                playerName = getPlayerNameFromClient(s);
                 addPlayerToQueue(playerName);
                 
-                //
+                //waiting to  join game
+                waitToJoinGame();
+                System.out.println("Player: " + playerName + " joined game");
+
+                //if  playerName == playerNames[0] --> get X
+                //get valid X --> generate secrete code --> SECRETE CODE VALID
+                //else wait for x
+                while(true){
+                    System.out.println("Getting X");
+                    if(playerName == playerNames.get(0)){
+                        System.out.println("Getting X from first player: "+ playerName + " ....");
+                        out.println(SUBMIT_X);
+                        String line = in.readLine();
+                        if(line != null){
+                            if(isNumeric(line)){
+                                if(convertStringToInt(line) >= 3  && convertStringToInt(line)<=8){
+                                    setX(convertStringToInt(line));
+                                    System.out.println("Selected X: "+  x);
+                                    out.println(X_ACCEPTED);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if(x!= 0){
+                        out.println(X_ACCEPTED);
+                    }
+
+                    try{
+                        Thread.sleep(SLEEP_MILLISECOND);
+                    }catch (InterruptedException e){
+                        e.printStackTrace();;
+                    }
+                }
+
+
+                
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -70,6 +108,35 @@ public class MServer extends SocketAgent {
                 }
             }
 
+        }  
+        private synchronized void setX(int val){
+            x = val;
+        }
+        private void waitToJoinGame(){
+            while(true){
+                int playerCount = getPlayerCount();
+                for(int i = 0; i<playerCount ; i++){
+                    String name = playerNames.get(i);
+                    if(playerName.equals(name)){
+                        System.out.println("Player is going joinning game: "+ playerName);
+                        out.println(JOIN_GAME); 
+                        return;
+                    }
+                }
+                out.println(WAIT_FOR_GAME);
+                System.out.println("Waiting...");
+                try{
+                    Thread.sleep(SLEEP_MILLISECOND);
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+            } 
+        }
+        //get player count in a single game
+        public int getPlayerCount(){
+            int playerCount = 0;
+            playerCount = playerNames.size()<PLAYER_COUNT? playerNames.size(): PLAYER_COUNT;
+            return playerCount;
         }
 
         public String getPlayerNameFromClient(Socket s) throws IOException {
@@ -83,17 +150,17 @@ public class MServer extends SocketAgent {
                 }
                 if (!playerNames.contains(playerName)) {
                     break;
-
                 }
             }
             out.println(NAME_ACCEPTED);
-            System.out.println("Player  name:" + playerName);
             return playerName;
         }
 
         public void addPlayerToQueue(String playerName) {
             synchronized (playerNames) {
                 playerNames.add(playerName);
+                if(playerNames.contains(playerName)){
+                }
             }
         }
     }

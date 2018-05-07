@@ -24,6 +24,14 @@ public  abstract class SocketAgent{
     final static String LOSE_MESSAGE  = "You lost!";
     final static String NAME_ACCEPTED = "NAME_ACCEPTED";
     final static String SUBMIT_NAME = "SUBMIT_NAME";
+    final static String JOIN_GAME = "JOIN_GAME";
+    final static String WAIT_FOR_GAME = "WAIT_FOR_GAME";
+    final static int PLAYER_COUNT = 2;
+    final static int SLEEP_MILLISECOND = 7000;
+    final static String SUBMIT_X = "SUBMIT_X";
+    final static String X_ACCEPTED = "X_ACCEPTED";
+
+
    
     //read and print a String message from socket
     public static String readMessage(Socket s){
@@ -68,6 +76,7 @@ public  abstract class SocketAgent{
         }
         
     }
+  
 
     public static int[] convertStringToIntArray(String line){
         int[] intArray = new int[line.length()];
