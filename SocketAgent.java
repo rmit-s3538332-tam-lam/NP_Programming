@@ -22,6 +22,8 @@ public  abstract class SocketAgent{
     final static String START_GUESSING_MESSAGE = "Please enter your guess";
     final static String WIN_MESSAGE = "You won!";
     final static String LOSE_MESSAGE  = "You lost!";
+    final static String NAME_ACCEPTED = "NAME_ACCEPTED";
+    final static String SUBMIT_NAME = "SUBMIT_NAME";
    
     //read and print a String message from socket
     public static String readMessage(Socket s){
@@ -38,7 +40,23 @@ public  abstract class SocketAgent{
         }
         return message;
     }
-    
+    public static class QuitThread extends Thread{
+        @Override
+        public void run (){
+            try{
+                InputStream in =  System.in;
+                BufferedReader reader = new  BufferedReader(new InputStreamReader(in));
+                String  line = null;
+                if ((line =  reader.readLine())!= null){
+                    if (line.equals("q")){
+                        System.exit(0);
+                    }
+                }
+            } catch(IOException  e){
+                e.printStackTrace();
+            }   
+        }
+    }
     //send string message through socket
     public static void sendMessage(Socket s, String message){
         try{
@@ -91,4 +109,5 @@ public  abstract class SocketAgent{
         return true;
     }
     
+
 }
