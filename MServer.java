@@ -52,6 +52,7 @@ public class MServer extends SocketAgent {
         private PrintWriter out;
         private Socket s;
         private int x;
+        private boolean replay;
 
         public ClientThread(Socket s) {
 
@@ -86,17 +87,8 @@ public class MServer extends SocketAgent {
                 System.out.println("Everyone has finish their game");
                 out.println(EVERYONE_FINISHED);
                 announceRanking();
-                // //play game
-                // //finish game --> wait for other players to finish game.
-
-                // //wait for all player to finish playing
-                // while(true){
-                // if( isAllPlayerFinishPlaying()){
-                // System.out.println("Game ended");
-                // out.println(GAME_ENDED);
-                // break;
-                // }
-                // }
+                replayPromting();
+                System.out.println("Replay: " + replay);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -114,9 +106,28 @@ public class MServer extends SocketAgent {
             }
 
         }
-        public void replayPromting()throws IOException{
+
+        public void replayPromting() throws IOException {
+            System.out.println("Prompting client to replay:");
             out.println(REPLAY_PROMPT);
+            String line;
+            while (true) {
+                line = in.readLine();
+                if (line != null) {
+                    if (line.equals(QUIT)) {
+                        System.out.println(playerName+ " : choose to replay");
+                        replay = false;
+                        return;
+                    }
+                    if (line.equals(REPLAY)) {
+                        replay = true;
+                        System.out.println(playerName+ " : choose to replay");
+                        return;
+                    }
+                }
+            }
         }
+
         public void play() throws IOException {
             Boolean match = false;
             boolean isForfeited = false;
@@ -170,11 +181,11 @@ public class MServer extends SocketAgent {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if (isAllPlayerFinishPlaying()){
+                if (isAllPlayerFinishPlaying()) {
                     System.out.println(playerName + ": somebody hasn't  finish with  their game ...");
                     return;
                 }
-                
+
             }
         }
 
@@ -182,22 +193,26 @@ public class MServer extends SocketAgent {
             int[] sortedAttemptCounts = attemptCounts;
             String[] sortedPlayerNames = new String[PLAYER_COUNT];
             Arrays.sort(sortedAttemptCounts);
-            for(int i = 0; i< sortedAttemptCounts.length;i++){
-                sortedPlayerNames[i] = playerNames.get(i).toString();
+            if(sortedAttemptCounts.length ==1){
+                sortedPlayerNames[0] =  playerNames.get(0);
+            }else{
+                for (int i = 0; i < sortedAttemptCounts.length; i++) {
+                    sortedPlayerNames[i] = playerNames.get(i);
+                }
             }
+            
             System.out.println(Arrays.toString(sortedAttemptCounts));
             System.out.println(Arrays.toString(sortedPlayerNames));
             out.println(FINAL_RANKING);
             out.println("====================================");
             out.println("Ranking:");
-            String message = "====================================\n"+
-            "Ranking: \n";
-            for(int i = 0; i< PLAYER_COUNT;i++){
+            String message = "====================================\n" + "Ranking: \n";
+            for (int i = 0; i < PLAYER_COUNT; i++) {
                 String name = sortedPlayerNames[i];
                 int count = sortedAttemptCounts[i];
-                String line = (i+1)+ ". " + name + ", " + count+ " attempts";
+                String line = (i + 1) + ". " + name + ", " + count + " attempts";
                 out.println(line);
-                message+= line+ "\n"; 
+                message += line + "\n";
             }
             out.println("====================================");
             message += "====================================\n";

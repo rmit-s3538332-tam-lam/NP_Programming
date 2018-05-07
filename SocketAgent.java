@@ -37,6 +37,8 @@ public  abstract class SocketAgent{
     final static String FINAL_RANKING = "FINAL_RANKING";
     final static String EVERYONE_FINISHED = "EVERYONE_FINISHED";
     final static String REPLAY_PROMPT = "REPLAY_PROMPT";
+    final static String QUIT = "QUIT";
+    final static String REPLAY = "REPLAY";
 
 
     final static String FORFEIT = "f";

@@ -12,6 +12,7 @@ import java.net.UnknownHostException;
 public class MClient extends SocketAgent {
     private BufferedReader in;
     private PrintWriter out;
+    private BufferedReader consoleIn;
 
     public static void main(String[] args) throws UnknownHostException, IOException {
         MClient client = new MClient();
@@ -20,6 +21,7 @@ public class MClient extends SocketAgent {
 
     public void run() throws IOException {
         Socket s = new Socket(SERVER_ADDRESS, PORT_NUMBER);
+        consoleIn  = new BufferedReader(new InputStreamReader(System.in));
         in = new BufferedReader(new InputStreamReader(s.getInputStream()));
         out = new PrintWriter(s.getOutputStream(), true);
         sendingPlayerName();
@@ -30,6 +32,8 @@ public class MClient extends SocketAgent {
         guesssing();
         waitForToEveryoneFinish();
         readingRanking();
+        replayPrompt();
+        System.out.println("aefafa");
     }
     private void waitForToEveryoneFinish() throws IOException{
         String line;
@@ -60,9 +64,39 @@ public class MClient extends SocketAgent {
                         count++;
                     }
                     System.out.println(in.readLine());
+                    return;
                 }
             }
             
+        }
+    }
+
+    private void replayPrompt() throws IOException{
+        String  line;
+        while(true){
+            line = in.readLine();
+            if (line!=null && line.equals(REPLAY_PROMPT)){
+                sendingReplayPromptFromConsole();
+                return;
+            }
+        }
+    }
+    private void sendingReplayPromptFromConsole() throws IOException{
+        String line;
+        while(true){
+            System.out.println("Enter p to replay, q to quit: ");
+            if((line = consoleIn.readLine())!=null){
+                if(line.equalsIgnoreCase("p")){
+                    out.println(REPLAY);
+                    System.out.println("Re-entered queue");
+                    return;
+                }
+                if(line.equalsIgnoreCase("q")){
+                    out.println(QUIT);
+                    System.out.println("Quitting");
+                    return;
+                }
+            }
         }
     }
     private void guesssing() throws IOException {
@@ -90,7 +124,7 @@ public class MClient extends SocketAgent {
         String guessCodeString = null;
         guessCodeString = null;
         String line = null;
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader in = consoleIn;
         while (true) {
             System.out.println("Please enter an unquie number guess code: ");
             if ((line = in.readLine()) != null) {
@@ -165,8 +199,7 @@ public class MClient extends SocketAgent {
     private String getNameFromConsole() throws IOException {
         System.out.println("Please enter a unquie player name:");
         String playerName = null;
-        InputStream in = System.in;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        BufferedReader reader = consoleIn;
         while (true) {
             String line = reader.readLine();
             if (line != null && line.trim().length() > 0) {
@@ -178,11 +211,10 @@ public class MClient extends SocketAgent {
         return playerName;
     }
 
-    public static String getXFromConsole() throws IOException {
+    public  String getXFromConsole() throws IOException {
         System.out.println("You are the first player. \nPlease enter a X integer from 3-8:");
         String xString = null;
-        InputStream in = System.in;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        BufferedReader reader = consoleIn;
         String line = null;
         while (true) {
             if ((line = reader.readLine()) != null) {
