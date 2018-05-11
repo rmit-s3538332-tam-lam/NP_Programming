@@ -85,7 +85,7 @@ public class SinglePlayerClient extends SocketAgent{
                 if((line = reader.readLine())!=null){
                     if(isNumeric(line) && isUnquie(line)){
                         guessCodeString = line;
-                        System.out.println("Guess code an number entered: "+guessCodeString);
+                        // System.out.println("Guess code an number entered: "+guessCodeString);
                         break;
                     }
                 }

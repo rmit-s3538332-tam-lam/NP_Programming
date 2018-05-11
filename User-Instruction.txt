@@ -1,0 +1,6 @@
+Single-player client instruction:
+1. Enter a X integer when get prompted by server
+2. Server will send message prompt user to input guess once secret code is generated
+3. User can make guess by entering a unquie number
+3. If guess number is a valid unquie
+4. 

@@ -15,7 +15,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 //Storing common  and utility functions used by Clients and Servers
-public  abstract class SocketAgent{
+public abstract class SocketAgent{
     final static int PLAYER_COUNT = 2;
     final static String SERVER_ADDRESS = "127.0.0.1";
     final static int PORT_NUMBER = 6073;

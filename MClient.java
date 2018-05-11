@@ -30,15 +30,14 @@ public class MClient extends SocketAgent {
             waitToJoinGame();
             gettingX();
             waitForSecretCode();
-            System.out.println("Start guessing...");
             guesssing();
             waitForToEveryoneFinish();
             readingRanking();
             replayPrompt();
             if(!replay){
+                System.out.println("Quitting...");
                 return;
             }
-            System.out.println("test reach");
         }
    
     }
@@ -96,13 +95,11 @@ public class MClient extends SocketAgent {
                 if(line.equalsIgnoreCase("p")){
                     replay = true;
                     out.println(REPLAY);
-                    System.out.println("Re-entered queue");
                     return;
                 }
                 if(line.equalsIgnoreCase("q")){
                     out.println(QUIT);
                     replay = false;
-                    System.out.println("Quitting");
                     return;
                 }
             }
@@ -113,12 +110,10 @@ public class MClient extends SocketAgent {
         while (true) {
             line = in.readLine();
             if (line.equals(SUBMIT_GUESS)) {
-                System.out.println("Please enter your unique guess code:");
                 out.println(getGuessCodeString());
                 ;
             }
             if (line.equals(FINISH_PLAYING)) {
-                System.out.println("Finish game");
                 System.out.println(in.readLine());
                 return;
             }
@@ -139,7 +134,6 @@ public class MClient extends SocketAgent {
             if ((line = in.readLine()) != null) {
                 if (isNumeric(line) && isUnquie(line)) {
                     guessCodeString = line;
-                    System.out.println("Guess code an number entered: " + guessCodeString);
                     return guessCodeString;
                 }
                 if (line.equals(FORFEIT)) {
@@ -213,7 +207,7 @@ public class MClient extends SocketAgent {
             String line = reader.readLine();
             if (line != null && line.trim().length() > 0) {
                 playerName = line;
-                System.out.println("Name: " + playerName);
+                // System.out.println("Name: " + playerName);
                 break;
             }
         }

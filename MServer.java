@@ -65,12 +65,12 @@ public class MServer extends SocketAgent {
         @Override
         public void run() {
             try {
-                System.out.println("New client is connected...");
+                System.out.println("New player is connected...");
                 in = new BufferedReader(new InputStreamReader(s.getInputStream()));
                 out = new PrintWriter(s.getOutputStream(), true);
                 // getting player name and add it to playerQueue
                 playerName = getPlayerNameFromClient(s);
-
+                System.out.println(playerName +": is waiting in queue");
                 while (true) {
                     addPlayerToQueue(playerName);
                     waitToJoinGame();
@@ -80,7 +80,7 @@ public class MServer extends SocketAgent {
                     System.out.println("X accepted: " + x);
 
                     gettingSecretCode();
-                    System.out.println(playerName + ": Generated secret code: " + Arrays.toString(secretCode));
+                    System.out.println(playerName + ": generated secret code - " + Arrays.toString(secretCode));
 
                     play();
 
@@ -92,12 +92,9 @@ public class MServer extends SocketAgent {
                     announceRanking();
                     replayPromting();
                     updateHasFinalChoice(playerName, true);
-                    System.out.println("Replay: " + replay);
-                    System.out.println("Waiting for other players to make responses...");
                     while(true){
                         if( haveAllPlayerMakeFinalChoice()){
                             if (replay) {
-                                System.out.println("Replaying..");
                                 synchronized (playerNames) {
                                     playerNames.remove(playerName);
                                 }
@@ -109,7 +106,6 @@ public class MServer extends SocketAgent {
                                 break;
                             }
                             if (!replay) {
-                                System.out.println("No replay");
                                 return;
                             }
                         }
@@ -180,12 +176,11 @@ public class MServer extends SocketAgent {
                     if (guessCodeString.equals(FORFEIT)) {
                         System.out.println(playerName + ": forfeit game");
                         isForfeited = true;
-                        System.out.println("Forfeit:" + isForfeited);
                         updateAttemptCount(playerName, FORFEIT_ATTEMPT_COUNT);
                         break;
                     }
                     int[] guessCode = convertStringToIntArray(guessCodeString);
-                    System.out.println("Guess secrete code: " + Arrays.toString(guessCode));
+                    System.out.println(playerName+ ": guess secrete code - " + Arrays.toString(guessCode));
 
                     if (isMatch(secretCode, guessCode)) {
                         match = true;
@@ -203,7 +198,6 @@ public class MServer extends SocketAgent {
             }
             // last iteration
             if (attemptCount == 11 && !isForfeited) {
-                System.out.println("LOSe 10 update");
                 attemptCount -= 1;
                 updateAttemptCount(playerName, attemptCount);
             }
@@ -315,13 +309,11 @@ public class MServer extends SocketAgent {
                 // First player's server thread generate secrete code
                 if (playerName.equals(playerNames.get(0))) {
                     secretCode = generateSecretCode(x);
-                    System.out.println("Secret code is successfully generated");
                     out.println(SECRET_CODE_GENERATED);
                     return;
                 }
                 // other player wait until code is generated
                 if (secretCode != null && secretCode.length != 0) {
-                    System.out.println("Secret code is successfully generated");
                     out.println(SECRET_CODE_GENERATED);
                     return;
                 }
@@ -337,7 +329,6 @@ public class MServer extends SocketAgent {
         // if client is the first player, get X from client
         private void gettingX() throws IOException {
             while (true) {
-                System.out.println(playerName + ": getting X");
                 if (playerName == playerNames.get(0)) {
                     System.out.println("Getting X from first player: " + playerName + " ....");
                     out.println(SUBMIT_X);
@@ -355,7 +346,6 @@ public class MServer extends SocketAgent {
                     }
                 }
                 if (isXValid) {
-                    System.out.println(playerName + ": Accept x");
                     out.println(X_ACCEPTED);
                     return;
                 }
@@ -418,7 +408,6 @@ public class MServer extends SocketAgent {
             String playerName;
             while (true) {
                 out.println(SUBMIT_NAME);
-                System.out.println("Getting player  name...");
                 playerName = in.readLine();
                 if (playerName == null) {
                     return playerName;
