@@ -18,7 +18,7 @@ import java.net.Socket;
 public abstract class SocketAgent{
     final static int PLAYER_COUNT = 2;
     final static String SERVER_ADDRESS = "127.0.0.1";
-    final static int PORT_NUMBER = 6073;
+    final static int PORT_NUMBER = 18332;
     final static String X_ACCEPTED_MESSAGE = "Server accepted X";
     final static String START_GUESSING_MESSAGE = "Please enter your guess";
     final static String WIN_MESSAGE = "You won!";

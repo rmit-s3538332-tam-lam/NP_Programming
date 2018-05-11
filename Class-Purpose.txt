@@ -1,0 +1,9 @@
+SinglePlayerClient.java : Storing mechanic for single-player client
+SinglePlayerSever.java : Storing mechanic for single-player server
+
+MultiplayerClient.java : Storing mechanic for multi-player client
+MultiplayerServer.java : Storing mechanic for multi-player server
+
+SocketAgent.java : Storing common function and constants for all class above
+GameMechanic.java  : Ignore this file. 
+                     Storing game mechanic in offline mode(player will console)

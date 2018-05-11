@@ -1,6 +1,29 @@
-Single-player client instruction:
+
+SINGLE-PLAYER gameplay instruction:
+
 1. Enter a X integer when get prompted by server
-2. Server will send message prompt user to input guess once secret code is generated
-3. User can make guess by entering a unquie number
-3. If guess number is a valid unquie
-4. 
+2. Server will send message prompt user to input guess once secret
+   code is generated
+3. User can make guess by entering a unique number
+3. If the guess is correct, you win the game
+4. If guess is incorrect, you will get a hint from server
+5. You have 10 attempts to make guesses
+6. If you don't guess correctly in 10 attempt, you will lose
+7. Game quits. To replay start a new game.
+
+------------------------------------------------------------------------
+
+MULTI-PLAYER gameplay instruction:
+
+1. You must first enter a unique player name
+2. If you are the first player, server will prompt you to enter X
+3. Server will prompt you to enter guess code once first player
+   has enter a valid X and secret code to be generated
+4. You can start making guesses with up to 10 attempts or choose
+   To forfeit the game at any attempt.
+5. After you complete the game by either wining, losing or forfeiting
+   the game will prompt you to wait for other player in the round to
+   complete their game
+6. Once everyone has completed their game, the game will show you the
+   Ranking result
+7. You can choose to replay or quit by pressing 'p' or 'q'

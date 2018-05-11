@@ -189,7 +189,7 @@ public class MultiplayerClient extends SocketAgent {
         while (true) {
             String line = in.readLine();
             if (line.equals(SUBMIT_NAME)) {
-                System.out.println("getNameFromConsole()");
+                // System.out.println("getNameFromConsole()");
                 out.println(getNameFromConsole());
             }
             if (line.equals(NAME_ACCEPTED)) {
