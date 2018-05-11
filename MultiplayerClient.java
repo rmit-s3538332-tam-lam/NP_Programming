@@ -9,13 +9,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class MClient extends SocketAgent {
+public class MultiplayerClient extends SocketAgent {
     private BufferedReader in;
     private PrintWriter out;
     private BufferedReader consoleIn;
     private boolean replay;
     public static void main(String[] args) throws UnknownHostException, IOException {
-        MClient client = new MClient();
+        MultiplayerClient client = new MultiplayerClient();
         client.run();
     }
 
